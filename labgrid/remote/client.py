@@ -151,9 +151,17 @@ class ClientSession(ApplicationSession):
             for exporter, groups in sorted(self.resources.items()):
                 for group_name, group in sorted(groups.items()):
                     for _, resource in sorted(group.items()):
+                        if self.args.mine and resource.acquired != "{}/{}".format(gethostname(), getuser()):
+                            continue
+                        if self.args.acquired and resource.acquired is None:
+                            continue
                         print("{}/{}/{}".format(exporter, group_name, resource.cls))
         elif self.args.type == 'places':
-            for name in sorted(self.places.keys()):
+            for name, place in self.places:
+                if self.args.mine and place.acquired != "{}/{}".format(gethostname(), getuser()):
+                    continue
+                if self.args.acquired and place.acquired is None:
+                    continue
                 print(name)
 
     def _get_places_by_resource(self, resource_path):
@@ -1062,6 +1070,8 @@ def main():
     subparser = subparsers.add_parser('help')
 
     subparser = subparsers.add_parser('complete')
+    subparser.add_argument('-a', '--acquired', action='store_true')
+    subparser.add_argument('-m', '--mine', action='store_true')
     subparser.add_argument('type', choices=['resources', 'places'])
     subparser.set_defaults(func=ClientSession.complete)
 
