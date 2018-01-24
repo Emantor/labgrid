@@ -5,7 +5,7 @@ pexpect==4.3.1
 pyModbusTCP==0.1.5
 pyserial>=3.3
 pysnmp==4.4.4
-pysnmp-mibs
+pysnmp-mibs==0.1.6
 pytest
 pytest-cache
 pytest-cov
