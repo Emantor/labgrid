@@ -9,7 +9,7 @@ pysnmp-mibs==0.1.6
 pytest==3.3.2
 pytest-cache==1.0
 pytest-cov==2.5.1
-pytest-isort
+pytest-isort==0.1.0
 pytest-mock
 pytest-pylint
 pytest-runner
