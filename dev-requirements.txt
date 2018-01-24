@@ -14,7 +14,7 @@ pytest-mock==1.6.3
 pytest-pylint==0.7.1
 pytest-runner==3.0
 onewire>=0.2
-pyudev
+pyudev==0.21.0
 yapf
 requests
 autobahn
