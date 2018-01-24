@@ -7,7 +7,7 @@ pyserial>=3.3
 pysnmp==4.4.4
 pysnmp-mibs==0.1.6
 pytest==3.3.2
-pytest-cache
+pytest-cache==1.0
 pytest-cov
 pytest-isort
 pytest-mock
