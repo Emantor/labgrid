@@ -2,7 +2,7 @@ PyYAML==3.12
 attrs==17.4.0
 crossbar==17.12.1
 pexpect==4.3.1
-pyModbusTCP
+pyModbusTCP==0.1.5
 pyserial>=3.3
 pysnmp
 pysnmp-mibs
