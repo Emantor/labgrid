@@ -16,7 +16,7 @@ pytest-runner==3.0
 onewire>=0.2
 pyudev==0.21.0
 yapf==0.20.1
-requests
+requests==2.18.4
 autobahn
 xmodem>=0.4.5
 -r doc-requirements.txt
