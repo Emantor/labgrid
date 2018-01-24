@@ -12,7 +12,7 @@ pytest-cov==2.5.1
 pytest-isort==0.1.0
 pytest-mock==1.6.3
 pytest-pylint==0.7.1
-pytest-runner
+pytest-runner==3.0
 onewire>=0.2
 pyudev
 yapf
