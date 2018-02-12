@@ -6,7 +6,7 @@ pyModbusTCP
 pyserial>=3.3
 pysnmp
 pysnmp-mibs
-pytest
+pytest==3.4.0
 pytest-cache
 pytest-cov
 pytest-isort
