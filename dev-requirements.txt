@@ -15,7 +15,7 @@ pytest-pylint
 pytest-runner
 onewire>=0.2
 pyudev
-yapf
+yapf==0.20.1
 requests
 autobahn
 xmodem>=0.4.5
