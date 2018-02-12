@@ -17,6 +17,6 @@ onewire>=0.2
 pyudev
 yapf
 requests
-autobahn
+autobahn==17.10.1
 xmodem>=0.4.5
 -r doc-requirements.txt
