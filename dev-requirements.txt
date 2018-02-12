@@ -11,7 +11,7 @@ pytest-cache
 pytest-cov
 pytest-isort
 pytest-mock
-pytest-pylint
+pytest-pylint==0.8.0
 pytest-runner
 onewire>=0.2
 pyudev
