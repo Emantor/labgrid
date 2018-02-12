@@ -8,7 +8,7 @@ pysnmp
 pysnmp-mibs
 pytest
 pytest-cache
-pytest-cov
+pytest-cov==2.5.1
 pytest-isort
 pytest-mock
 pytest-pylint
