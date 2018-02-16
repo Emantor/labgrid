@@ -10,7 +10,7 @@ pytest
 pytest-cache
 pytest-cov
 pytest-isort
-pytest-mock
+pytest-mock==1.7.0
 pytest-pylint
 pytest-runner
 onewire>=0.2
