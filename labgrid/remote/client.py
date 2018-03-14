@@ -550,11 +550,22 @@ class ClientSession(ApplicationSession):
         manager.session = self
         manager.loop = self.loop
 
+    def _get_env_target(self, name):
+        targets = self.env.config.get_targets()
+        if place.name in targets:
+            return self.env.get_target(name)
+        if 'main' in targets:
+            return self.env.get_target()
+        print(
+            "Got an environment but could not find {} or main as targets, continuing without using environment".
+            format(name)
+        )
+
     def _get_target(self, place):
         self._prepare_manager()
         target = None
         if self.env:
-            target = self.env.get_target(place.name)
+            target = self._get_env_target(place.name)
         if target:
             if self.args.state:
                 if self.args.verbose >= 2:
