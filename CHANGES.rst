@@ -4,6 +4,14 @@ Release 0.2.0 (unreleased)
 New Features
 ~~~~~~~~~~~~
 
+- Driver priorities have been implemented
+- A bug in the ser2net child configuration has been fixed which could close the
+  connection unexpectedly
+- The whole project has been linted and a config has been added
+- The Gude Export Power Control 8316 is supported by gude8316 backend
+- The IMXUSBLoader Resource supports all currently available i.MX6 and i.MX7 variants
+- The ``--lg-log`` option enables logging of the serial traffic into a file,
+  optionally a path can be passed where the files will be saved in.
 - The target now saves it's attached drivers, resources and protocols in a
   lookup table, avoiding the need of importing many Drivers and Protocols (see
   `Syntactic sugar for Targets`_)
@@ -32,6 +40,28 @@ New Features
 - The `SerialDriver` now supports using plain TCP instead of RFC 2217, which is
   needed from some console servers.
 - Experimental: The labgrid-autoinstall tool was added (see below).
+- Support for the YEPKIT YKUSH switchable USB hubs in the PowerDriver
+- A ConsoleLogging Reporter which writes all received serial traffic to a file
+  (see below)
+- Support for Modbus for the DigitalOutputProtocol
+- DigitalOutput Resources can now be inverted
+- Requirements files have been split up for individual use cases
+- Setup instructions were overhauled to use the new requirements*.txt files
+- Support for Sigrok Devices to record and analyze samples
+- LG_* variables from the OS environment can be mapped into the config file with
+  !template
+- Support for Quartus HPS to flash images onto devices
+- A SmallUBootDriver for devices with no shell features in U-Boot
+- Support to specify decoding for ShellDriver and SSHDriver
+- The Pengutronix USBSDMux is supported in labgrid
+- Driver priorities
+- Support to use serial DTR/RTS as digital outputs
+- a generic http backend for the networkpowerdriver
+- Support to switch power on certain USB Hubs
+- ExecutionError exceptions now contain the output
+- A GraphStrategy which can take multiple paths to a desired state
+- The remote infrastructure has support for tmc programmable oscilloscopes and
+  USB Webcams now, at the moment only one specific model for each is supported.
 
 Incompatible Changes
 ~~~~~~~~~~~~~~~~~~~~
@@ -137,6 +167,30 @@ gadget.
 
 .. note::
   ``labgrid-autoinstall`` is still experimental and no documentation has been written.
+
+ConsoleLogging Reporter
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The ConsoleLoggingReporter can be used with the pytest plugin or during library
+use. It records the Data send from a DUT to the computer running labgrid. The
+Logfile contains a header with the name of the device from the environment
+configuration and a timestamp.
+
+During library use the Reporter can be started with:
+
+::
+
+    from labgrid.consoleloggingreporter import ConsoleLoggingReporter
+
+    ConsoleLoggingReporter.start(".")
+
+where "." is the output directory.
+
+The pytest plugin accepts the "--lg-log" commandline option, either with or
+without an output path.
+
+Driver Priorities
+~~~~~~~~~~~~~~~~~
 
 Release 0.1.0 (released May 11, 2017)
 -------------------------------------
