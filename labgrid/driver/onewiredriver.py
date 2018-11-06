@@ -14,7 +14,7 @@ class OneWirePIODriver(Driver, DigitalOutputProtocol):
     def __attrs_post_init__(self):
         import onewire
         super().__attrs_post_init__()
-        self.onewire = onewire.Onewire(self.port.host)
+        self.onewire = onewire.Onewire("{}:{}".format(self.port.host, self.port.port))
 
     @Driver.check_active
     def set(self, status):
