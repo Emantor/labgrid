@@ -14,12 +14,8 @@ class ModbusCoilDriver(Driver, DigitalOutputProtocol):
     def __attrs_post_init__(self):
         super().__attrs_post_init__()
         self._module = import_module('pyModbusTCP.client')
-        port = "502"
-        host = self.coil.host
-        if ':' in host:
-            host, port = host.split(':', 1)
         self.client = self._module.ModbusClient(
-            host=host, port=int(port), auto_open=True, auto_close=True)
+            host=self.coil.host, port=int(self.coil.port), auto_open=True, auto_close=True)
 
     @Driver.check_active
     def set(self, status):
