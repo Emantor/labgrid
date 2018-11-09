@@ -315,8 +315,6 @@ class SSHConnection:
                 "-o", "ControlPersist=300",
                 "-o", "ControlMaster=yes",
                 "-o", "ControlPath={}".format(control),
-                "-o", "UserKnownHostsFile=/dev/null",
-                "-o", "StrictHostKeyChecking=no",
                 self.host,
         ]
 
