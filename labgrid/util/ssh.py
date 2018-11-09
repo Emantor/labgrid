@@ -169,7 +169,8 @@ class SSHConnection:
         complete_cmd.append(self.host)
         res = subprocess.check_call(
             complete_cmd,
-            timeout=2
+            stdin=subprocess.DEVNULL,
+            timeout=2,
         )
 
         return res
@@ -202,7 +203,8 @@ class SSHConnection:
         complete_cmd = ["ssh"] + self._get_ssh_args()
         complete_cmd += [self.host, command]
         res = subprocess.check_call(
-            complete_cmd
+            complete_cmd,
+            stdin=subprocess.DEVNULL,
         )
 
         return res
@@ -215,7 +217,10 @@ class SSHConnection:
                 "{}:{}".format(self.host, remote_file),
                 "{}".format(local_file)
         ]
-        subprocess.check_call(complete_cmd)
+        subprocess.check_call(
+            complete_cmd,
+            stdin=subprocess.DEVNULL,
+        )
 
     @_check_connected
     def put_file(self, local_file, remote_path):
@@ -225,7 +230,10 @@ class SSHConnection:
                 "{}".format(local_file),
                 "{}:{}".format(self.host, remote_path)
         ]
-        subprocess.check_call(complete_cmd)
+        subprocess.check_call(
+            complete_cmd,
+            stdin=subprocess.DEVNULL,
+        )
 
     @_check_connected
     def add_port_forward(self, remote_host, remote_port):
@@ -281,9 +289,9 @@ class SSHConnection:
         # capture and parse it.
         proc = subprocess.Popen(
             args,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE
         )
         stdout, _ = proc.communicate(timeout=60)
         check = proc.wait(args)
@@ -315,9 +323,9 @@ class SSHConnection:
         assert self._master is None
         self._master = subprocess.Popen(
             args,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE
         )
 
         try:
@@ -362,9 +370,9 @@ class SSHConnection:
         assert self._keepalive is None
         self._keepalive = subprocess.Popen(
             args,
-            stderr=subprocess.PIPE,
             stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
         )
 
         self._logger.debug('Started keepalive for %s', self.host)
