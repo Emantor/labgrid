@@ -137,7 +137,7 @@ class SSHConnection:
     def _get_ssh_control_args(self):
         args = []
         if self._socket:
-            args + [
+            args = args + [
                     "-o", "ControlMaster=no",
                     "-o", "ControlPath={}".format(self._socket),
             ]
