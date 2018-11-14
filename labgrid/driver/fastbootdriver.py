@@ -48,16 +48,20 @@ class AndroidFastbootDriver(Driver):
     @Driver.check_active
     @step(args=['filename'])
     def boot(self, filename):
-        mf = ManagedFile(filename, self.fastboot)
-        mf.sync_to_resource()
-        self("boot", mf.get_remote_path())
+        if isinstance(filename, ManagedFile):
+            self("boot", partition, filename.get_remote_path())
+        else:
+            mf = self.preload(filename)
+            self("boot", partition, mf.get_remote_path())
 
     @Driver.check_active
     @step(args=['partition', 'filename'])
     def flash(self, partition, filename):
-        mf = ManagedFile(filename, self.fastboot)
-        mf.sync_to_resource()
-        self("flash", partition, mf.get_remote_path())
+        if isinstance(filename, ManagedFile):
+            self("flash", partition, filename.get_remote_path())
+        else:
+            mf = self.preload(filename)
+            self("flash", partition, mf.get_remote_path())
 
     @Driver.check_active
     @step(args=['cmd'])
@@ -68,3 +72,9 @@ class AndroidFastbootDriver(Driver):
     @step(title='continue')
     def continue_boot(self):
         self("continue")
+
+    @step(args=['filename'])
+    def preload(self, filename):
+        mf = ManagedFile(filename, self.fastboot)
+        mf.sync_to_resource()
+        return mf

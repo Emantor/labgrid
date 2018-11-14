@@ -37,14 +37,22 @@ class MXSUSBDriver(Driver, BootstrapProtocol):
     @Driver.check_active
     @step(args=['filename'])
     def load(self, filename=None):
+        if isinstance(filname, ManagedFile):
+            subprocess.check_call(
+                self.loader.command_prefix+[self.tool, "0", filename.get_remote_path()]
+            )
+        else:
+            mf = self.preload(filename)
+            subprocess.check_call(
+                self.loader.command_prefix+[self.tool, "0", mf.get_remote_path()]
+            )
+
+    def preload(self, filename=None):
         if filename is None and self.image is not None:
             filename = self.target.env.config.get_image_path(self.image)
         mf = ManagedFile(filename, self.loader)
         mf.sync_to_resource()
-
-        subprocess.check_call(
-            self.loader.command_prefix+[self.tool, "0", mf.get_remote_path()]
-        )
+        return mf
 
 
 @target_factory.reg_driver
@@ -73,11 +81,20 @@ class IMXUSBDriver(Driver, BootstrapProtocol):
     @Driver.check_active
     @step(args=['filename'])
     def load(self, filename=None):
+        if isinstance(filname, ManagedFile):
+            subprocess.check_call(
+                self.loader.command_prefix+[self.tool, "-p", str(self.loader.path), "-c", filename.get_remote_path()]
+            )
+        else:
+            mf = self.preload(filename)
+            subprocess.check_call(
+                self.loader.command_prefix+[self.tool, "-p", str(self.loader.path), "-c", mf.get_remote_path()]
+            )
+
+    @step(args=['filename'])
+    def preload(self, filename=None):
         if filename is None and self.image is not None:
             filename = self.target.env.config.get_image_path(self.image)
         mf = ManagedFile(filename, self.loader)
         mf.sync_to_resource()
-
-        subprocess.check_call(
-            self.loader.command_prefix+[self.tool, "-p", str(self.loader.path), "-c", mf.get_remote_path()]
-        )
+        return mf
