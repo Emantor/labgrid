@@ -356,3 +356,19 @@ class USBTMC(USBResource):
             return self.device.device_node
 
         return None
+
+@target_factory.reg_resource
+@attr.s(cmp=False)
+class USBRelais8(USBResource):
+    port = attr.ib(default=None)
+
+    def __attrs_post_init__(self):
+        self.match['@SUBSYSTEM'] = 'usb'
+        super().__attrs_post_init__()
+
+    @property
+    def path(self):
+        if self.device:
+            return self.device.device_path
+
+        return None
