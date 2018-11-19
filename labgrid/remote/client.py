@@ -621,8 +621,10 @@ class ClientSession(ApplicationSession):
         target = self._get_target(place)
         from ..resource.modbus import ModbusTCPCoil
         from ..resource.onewireport import OneWirePIO
+        from ..resource.udev import USBRelais8
         from ..driver.modbusdriver import ModbusCoilDriver
         from ..driver.onewiredriver import OneWirePIODriver
+        from ..driver.relais8driver import Relais8Driver
         drv = None
         for resource in target.resources:
             if isinstance(resource, ModbusTCPCoil):
@@ -638,6 +640,13 @@ class ClientSession(ApplicationSession):
                 except NoDriverFoundError:
                     target.set_binding_map({"port": name})
                     drv = OneWirePIODriver(target, name=name)
+                break
+            elif isinstance(resource, USBRelais8):
+                try:
+                    drv = target.get_driver(Relais8Driver, name=name)
+                except NoDriverFoundError:
+                    target.set_binding_map({"relais": name})
+                    drv = Relais8Driver(target, name=name)
                 break
         if not drv:
             raise UserError("target has no compatible resource available")
