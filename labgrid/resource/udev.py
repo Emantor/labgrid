@@ -297,6 +297,8 @@ class USBSDMuxDevice(USBResource):
         super().__attrs_post_init__()
 
     def update(self):
+        block_found = False
+
         super().update()
         if not self.device:
             self.control_path = None
@@ -305,8 +307,11 @@ class USBSDMuxDevice(USBResource):
         for child in self.device.children:
             if child.subsystem == 'block':
                 self.disk_path = child.device_node
-            elif child.subsystem == 'scsi_generic':
+                block_found = True
+            if child.subsystem == 'scsi_generic':
                 self.control_path = child.device_node
+        if not block_found:
+            self.disk_path = None
 
     @property
     def path(self):
