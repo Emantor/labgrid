@@ -715,8 +715,9 @@ class ClientSession(ApplicationSession):
         from ..protocol.bootstrapprotocol import BootstrapProtocol
         from ..driver.usbloader import IMXUSBDriver, MXSUSBDriver
         from ..driver.openocddriver import OpenOCDDriver
+        from ..driver.usbsdmuxdriver import USBSDMuxDriver
         from ..resource.remote import (NetworkMXSUSBLoader, NetworkIMXUSBLoader,
-                                       NetworkAlteraUSBBlaster)
+                                       NetworkAlteraUSBBlaster, NetworkUSBSDMuxDevice)
         drv = None
         try:
             drv = target.get_driver(BootstrapProtocol)
@@ -743,6 +744,14 @@ class ClientSession(ApplicationSession):
                     except NoDriverFoundError:
                         drv = OpenOCDDriver(target, name=None, **args)
                     drv.interface.timeout = self.args.wait
+                    break
+                elif isinstance(resource, NetworkUSBSDMuxDevice):
+                    args = dict(arg.split('=', 1) for arg in self.args.bootstrap_args)
+                    try:
+                        drv = target.get_driver(USBSDMuxDriver)
+                    except NoDriverFoundError:
+                        drv = USBSDMuxDriver(target, name=None, **args)
+                    drv.mux.timeout = self.args.wait
                     break
         if not drv:
             raise UserError("target has no compatible resource available")
