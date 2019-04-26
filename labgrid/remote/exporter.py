@@ -106,6 +106,14 @@ class ResourceExport(ResourceEntry):
             dirty = True
         return dirty
 
+    def acquire(self):
+        return
+
+    def release(self):
+        # Restart local services if the resource is released
+        if self.local.avail:
+            self.stop()
+            self.start()
 
 @attr.s(cmp=False)
 class USBSerialPortExport(ResourceExport):
@@ -383,14 +391,14 @@ class ExporterSession(ApplicationSession):
 
     async def acquire(self, group_name, resource_name):
         # TODO: perform local actions when a resource is acquired
-        #resource = self.groups[group_name][resource_name]
-        #resource.acquire()
+        resource = self.groups[group_name][resource_name]
+        resource.acquire()
         await self.update_resource(group_name, resource_name)
 
     async def release(self, group_name, resource_name):
         # TODO: perform local actions when a resource is released
-        #resource = self.groups[group_name][resource_name]
-        #resource.release()
+        resource = self.groups[group_name][resource_name]
+        resource.release()
         await self.update_resource(group_name, resource_name)
 
     async def version(self):

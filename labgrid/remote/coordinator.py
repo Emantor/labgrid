@@ -462,6 +462,11 @@ class CoordinatorComponent(ApplicationSession):
                     resource_path = (exporter, group_name, resource['cls'], resource_name)
                     if not place.hasmatch(resource_path):
                         continue
+                    if resource.acquired:
+                        return False
+                    await self.call("org.labgrid.exporter.{}.acquire".format(exporter),
+                                    group_name, resource_name)
+                    resource.acquired = True
                     place.acquired_resources.append(resource_path)
         place.touch()
         self.publish(
@@ -479,6 +484,10 @@ class CoordinatorComponent(ApplicationSession):
         if not place.acquired:
             return False
         place.acquired = None
+        for exporter, group_name, _, resource_name in place.acquired_resources:
+            # TODO: Remove acquired field of the ResourceEntry here
+            await self.call("org.labgrid.exporter.{}.release".format(exporter),
+                            group_name, resource_name)
         place.acquired_resources = []
         place.allowed = set()
         place.touch()
