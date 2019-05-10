@@ -61,10 +61,10 @@ class NetworkResource(Resource):
 
     @property
     def command_prefix(self):
-        return ['ssh', '-x',
-                '-o', 'ConnectTimeout=5',
-                '-o', 'PasswordAuthentication=no',
-                self.host, '--']
+        from ..util.proxy import proxymanager
+        prefix = proxymanager.get_ssh_prefix(self)
+
+        return prefix + ['--']
 
 
 @attr.s(cmp=False)

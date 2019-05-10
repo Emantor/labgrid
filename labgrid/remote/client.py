@@ -694,7 +694,7 @@ class ClientSession(ApplicationSession):
         target = self._get_target(place)
         from ..resource import NetworkSerialPort
         resource = target.get_resource(NetworkSerialPort, name=name)
-        host, port = proxymanager.get_host_and_port(resource, self.args.proxy)
+        host, port = proxymanager.get_host_and_port(resource)
 
         # check for valid resources
         assert port is not None, "Port is not set"
@@ -998,6 +998,8 @@ def start_session(url, realm, extra):
 
     session = [None]
 
+    url = proxymanager.get_url(url)
+
     def create():
         nonlocal session
         cfg = ComponentConfig(realm, extra)
@@ -1085,7 +1087,7 @@ def main():
     parser.add_argument(
         '-P',
         '--proxy',
-        type=bool,
+        action='store_true',
         default=False,
         help="proxy connections over ssh"
     )
@@ -1290,6 +1292,8 @@ def main():
     if not args.config and args.state:
         print("Setting the state requires a configuration file")
         exit(1)
+
+    proxymanager.force_proxy(args.proxy)
 
     env = None
     if args.config:
