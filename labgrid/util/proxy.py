@@ -18,7 +18,7 @@ class ProxyManager:
         cls.force_proxy = cls.force_proxy or force_proxy
 
     @classmethod
-    def get_ssh_prefix(cls, res, force_proxy=False):
+    def get_ssh_prefix(cls, res):
         assert isinstance(res, Resource)
 
         host = res.host
@@ -29,20 +29,18 @@ class ProxyManager:
             proxy_required = None
             proxy = None
 
-        if proxy_required or cls.force_proxy or force_proxy:
+        if proxy_required or cls.force_proxy:
             host = proxy
 
         conn = sshmanager.get(proxy)
         return conn.get_prefix()
 
     @classmethod
-    def get_host_and_port(cls, res, force_proxy=False):
+    def get_host_and_port(cls, res):
         """ get host and port for a proxy connection from a Resource
 
         Args:
             res (Resource): The resource to retrieve the proxy for
-            force_proxy (:obj:`bool`, optional): whether to always proxy the
-                connection, defaults to False
 
         Returns:
             (host, port) host and port for the proxy connection
@@ -63,19 +61,19 @@ class ProxyManager:
         if proxy_required is None or proxy is None:
             return res.host, res.port
 
-        if proxy_required or cls.force_proxy or force_proxy:
+        if proxy_required or cls.force_proxy:
             port = sshmanager.request_forward(proxy, res.host, res.port)
             host = 'localhost'
             return host, port
         return res.host, res.port
 
     @classmethod
-    def get_url(cls, url, force_proxy=False):
+    def get_url(cls, url):
         assert isinstance(url, str)
 
         s = urlsplit(url)
 
-        if not (cls.force_proxy or force_proxy):
+        if not cls.force_proxy:
             return urlunsplit(s)
 
         port = sshmanager.request_forward(s.hostname, '127.0.0.1', s.port)
