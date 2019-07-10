@@ -7,6 +7,8 @@ from .. import Environment
 from ..consoleloggingreporter import ConsoleLoggingReporter
 from .reporter import StepReporter, ColoredStepReporter
 from ..util.helper import processwrapper
+from ..step import steps
+from ..jsonloggingreporter import JSONLoggingReporter
 
 @pytest.hookimpl(trylast=True)
 def pytest_configure(config):
@@ -16,6 +18,7 @@ def pytest_configure(config):
     capturemanager = config.pluginmanager.getplugin('capturemanager')
     rewrite = True
     lg_log = config.option.lg_log
+    lg_json = config.option.lg_json
     if not capturemanager.is_globally_capturing():
         rewrite = False  # other output would interfere with our rewrites
     if terminalreporter.verbosity > 1:  # enable with -vv
@@ -27,6 +30,8 @@ def pytest_configure(config):
         logging.getLogger().setLevel(logging.DEBUG)
     if lg_log:
         ConsoleLoggingReporter(lg_log)
+    if lg_json:
+        JSONLoggingReporter(lg_log)
     env_config = config.option.env_config
     lg_env = config.option.lg_env
     lg_coordinator = config.option.lg_coordinator
@@ -82,3 +87,22 @@ def pytest_collection_modifyitems(config, items):
                 skip = pytest.mark.skip(reason="Skipping because features \"{}\" are not supported"
                                         .format(missing_feature))
             item.add_marker(skip)
+
+@pytest.hookimpl()
+def pytest_runtest_setup(item):
+    logging.debug("Setup")
+    if item.config.option.lg_json:
+        logging.debug("Setup: {}".format(item.name))
+        step = steps.get_new(item.name, tag='test_item', source=None)
+        item.user_properties.append(('labgrid_step', step))
+        step.start()
+
+
+@pytest.hookimpl()
+def pytest_runtest_teardown(item):
+    logging.debug("Teardown")
+    if item.config.option.lg_json:
+        logging.debug("Teardown: {}".format(item.name))
+        for i in item.user_properties:
+            if i[0] == 'labgrid_step':
+                i[1].stop()

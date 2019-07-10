@@ -41,6 +41,14 @@ def pytest_addoption(parser):
         action='store_true',
         dest='lg_colored_steps',
         help='colored step reporter')
+    group.addoption(
+        '--lg-json',
+        action='store',
+        dest='lg_json',
+        metavar='path to store json data',
+        nargs='?',
+        const=".",
+        help='path to json files')
 
 
 @pytest.fixture(scope="session")
