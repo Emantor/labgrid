@@ -689,10 +689,21 @@ class ClientSession(ApplicationSession):
         return target
 
     def power(self):
-        place = self.get_acquired_place()
-        action = self.args.action
+        name = self.args.name
+        assert isinstance(name, str)
+        if "," in name:
+            names = name.split(',')
+        else:
+            names = self.args.name
+        for name in names:
+            self._power(name)
+
+
+    def _power(self, name):
         delay = self.args.delay
         target = self._get_target(place)
+        place = self.get_acquired_place()
+        action = self.args.action
         from ..driver.powerdriver import NetworkPowerDriver, PDUDaemonDriver, USBPowerDriver
         from ..resource.power import NetworkPowerPort, PDUDaemonPort
         from ..resource.remote import NetworkUSBPowerPort
@@ -700,7 +711,7 @@ class ClientSession(ApplicationSession):
         for resource in target.resources:
             if isinstance(resource, NetworkPowerPort):
                 try:
-                    drv = target.get_driver(NetworkPowerDriver)
+                    drv = target.get_driver(NetworkPowerDriver,)
                 except NoDriverFoundError:
                     drv = NetworkPowerDriver(target, name=None, delay=delay)
                 break
@@ -708,13 +719,13 @@ class ClientSession(ApplicationSession):
                 try:
                     drv = target.get_driver(USBPowerDriver)
                 except NoDriverFoundError:
-                    drv = USBPowerDriver(target, name=None, delay=delay)
+                    drv = USBPowerDriver(target, name=name, delay=delay)
                 break
             elif isinstance(resource, PDUDaemonPort):
                 try:
                     drv = target.get_driver(PDUDaemonDriver)
                 except NoDriverFoundError:
-                    drv = PDUDaemonDriver(target, name=None, delay=int(delay))
+                    drv = PDUDaemonDriver(target, name=name, delay=int(delay))
                 break
         if not drv:
             raise UserError("target has no compatible resource available")
