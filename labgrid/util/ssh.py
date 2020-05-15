@@ -474,7 +474,7 @@ class SSHConnection:
         self._logger.debug('Started keepalive for %s', self.host)
 
     def _check_keepalive(self):
-        return self._keepalive.poll() is None
+        return self._keepalive and self._keepalive.poll() is None
 
     def _stop_keepalive(self):
         assert self._keepalive is not None
