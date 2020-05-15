@@ -91,3 +91,24 @@ def test_local_run_check(ssh_localhost, tmpdir):
 
     res = ssh_localhost.run_check("echo Hello")
     assert res == (["Hello"])
+
+@pytest.mark.sshusername
+def test_local_interact(ssh_localhost, tmpdir):
+
+    res = ssh_localhost.interact(["echo", "Hello"])
+    assert res == 0
+
+@pytest.mark.sshusername
+def test_local_interact_no_keepalive(target, pytestconfig):
+    name = pytestconfig.getoption("--ssh-username")
+    NetworkService(target, "service", "localhost", name)
+    SSHDriver(target, "ssh")
+    s = target.get_driver("SSHDriver", activate=False)
+    with pytest.raises(Exception):
+        s.interact(["echo", "Hello"])
+
+@pytest.mark.sshusername
+def test_local_sshfs(ssh_localhost, tmpdir):
+
+    res = ssh_localhost.sshfs()
+    assert res == 0
