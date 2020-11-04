@@ -113,3 +113,25 @@ def test_local_run_check(ssh_localhost, tmpdir):
 
     res = ssh_localhost.run_check("echo Hello")
     assert res == (["Hello"])
+
+
+@pytest.mark.sshusername
+def test_two_keepalives_same_host(pytestconfig, target):
+    name = pytestconfig.getoption("--ssh-username")
+    NetworkService(target, "one", "localhost", name)
+    NetworkService(target, "two", "localhost", name)
+    target.set_binding_map({"networkservice": "one"})
+    SSHDriver(target, "sshone")
+    target.set_binding_map({"networkservice": "two"})
+    SSHDriver(target, "sshtwo")
+    s1 = target.get_driver("SSHDriver", name="sshone")
+    s2 = target.get_driver("SSHDriver", name="sshtwo")
+
+    target.activate(s1)
+    target.activate(s2)
+    s1._check_keepalive()
+    s2._check_keepalive()
+    s1.run_check("ls")
+    s2.run_check("ls")
+    s1._check_keepalive()
+    s2._check_keepalive()
