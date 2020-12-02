@@ -15,7 +15,7 @@ from .common import Driver
 @attr.s(eq=False)
 class OpenOCDDriver(Driver, BootstrapProtocol):
     bindings = {
-        "interface": {"AlteraUSBBlaster", "NetworkAlteraUSBBlaster"},
+        "loader": {"AlteraUSBBlaster", "NetworkAlteraUSBBlaster"},
     }
 
     config = attr.ib(validator=attr.validators.instance_of((str, list)))
@@ -30,7 +30,7 @@ class OpenOCDDriver(Driver, BootstrapProtocol):
 
     def __attrs_post_init__(self):
         super().__attrs_post_init__()
-        self.logger = logging.getLogger("{}:{}".format(self, self.target))
+        self.logger = self.get_logger()
 
         # FIXME make sure we always have an environment or config
         if self.target.env:
