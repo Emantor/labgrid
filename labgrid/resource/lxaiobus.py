@@ -10,12 +10,13 @@ from .common import ManagedResource, ResourceManager
 
 @attr.s(eq=False)
 class LXAIOBusNodeManager(ResourceManager):
+
+    _last = attr.ib(default=0.0, validator=attr.validators.instance_of(float))
+
     def __attrs_post_init__(self):
         super().__attrs_post_init__()
 
         self.log = logging.getLogger('LXAIOBusNodeManager')
-
-        self._last = 0.0
 
     def _get_nodes(self, host):
         try:

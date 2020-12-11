@@ -535,6 +535,23 @@ class LXAIOBusNodeExport(ResourceExport):
 
 exports["LXAIOBusPIO"] = LXAIOBusNodeExport
 
+@attr.s(eq=False)
+class TasmotaPowerPortExport(ResourceExport):
+    """ResourceExport for LXAIOBusNode devices accessed via the HTTP API"""
+
+    def __attrs_post_init__(self):
+        super().__attrs_post_init__()
+        local_cls_name = self.cls
+        self.data['cls'] = "Network{}".format(self.cls)
+        from ..resource import mqtt
+        local_cls = getattr(mqtt, local_cls_name)
+        self.local = local_cls(target=None, name=None, **self.local_params)
+
+    def _get_params(self):
+        return self.local_params
+
+exports["TasmotaPowerPort"] = TasmotaPowerPortExport
+
 
 class ExporterSession(ApplicationSession):
     def onConnect(self):

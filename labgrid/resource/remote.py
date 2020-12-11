@@ -295,3 +295,22 @@ class NetworkLXAIOBusNode(ManagedResource):
 class NetworkLXAIOBusPIO(NetworkLXAIOBusNode):
     pin = attr.ib(validator=attr.validators.instance_of(str))
     invert = attr.ib(default=False, validator=attr.validators.instance_of(bool))
+
+@attr.s(eq=False)
+class NetworkMQTTResource(ManagedResource):
+    manager_cls = RemotePlaceManager
+
+    host = attr.ib(validator=attr.validators.instance_of(str))
+    avail_topic = attr.ib(validator=attr.validators.instance_of(str))
+
+    def __attrs_post_init__(self):
+        self.timeout = 30.0
+        super().__attrs_post_init__()
+
+@target_factory.reg_resource
+@attr.s(eq=False)
+class NetworkTasmotaPowerPort(NetworkMQTTResource):
+    power_topic = attr.ib(default=None,
+                         validator=attr.validators.instance_of(str))
+    status_topic = attr.ib(default=None,
+                         validator=attr.validators.instance_of(str))
