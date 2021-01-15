@@ -561,6 +561,18 @@ class ClientSession(ApplicationSession):
                 "failed to add match {} for place {}".format(pattern, place.name)
             )
 
+    def check_matches(self, place):
+        resources = []
+        for exporter, groups in self.resources.items():
+            for group_name, group in groups.items():
+                for resource_name, resource in group.items():
+                    resource_path = (exporter, group_name, resource.cls, resource_name)
+                    resources.append(resource_path)
+
+        match = place.unmatched(resources)
+        if match:
+            raise UserError("Match {} has no matching remote resource".format(match))
+
     async def acquire(self):
         """Acquire a place, marking it unavailable for other clients"""
         place = self.get_place()
@@ -569,9 +581,14 @@ class ClientSession(ApplicationSession):
                 "place {} is already acquired by {}".
                 format(place.name, place.acquired)
             )
+
+        if self.args.enforce:
+            self.check_matches(place)
+
         res = await self.call(
             'org.labgrid.coordinator.acquire_place', place.name
         )
+
         if res:
             print("acquired place {}".format(place.name))
             return
@@ -1411,6 +1428,8 @@ def main():
     subparser = subparsers.add_parser('acquire',
                                       aliases=('lock',),
                                       help="acquire a place")
+    subparser.add_argument('-e', '--enforce', action='store_true',
+                           help="Enforces that all matches for a place are fulfilled")
     subparser.set_defaults(func=ClientSession.acquire)
 
     subparser = subparsers.add_parser('release',
