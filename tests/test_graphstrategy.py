@@ -1,3 +1,5 @@
+from shutil import which
+
 import pytest
 
 
@@ -154,6 +156,7 @@ def test_api_works():
 
 # functional tests ############################################################
 @pytest.mark.dependency(depends=['api-works'])
+@pytest.mark.skipif(not which("graphviz"), reason="graphviz not available")
 def test_graphviz_graph(graph_strategy):
     graph_strategy.graph
     graph_strategy.graph  # trigger the caching branch in the graph code
