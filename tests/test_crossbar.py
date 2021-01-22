@@ -6,18 +6,19 @@ from importlib.util import find_spec
 
 import pytest
 import pexpect
-import psutil
 
 pytestmark = pytest.mark.skipif(not find_spec("crossbar"),
                               reason="crossbar required")
 
 def suspend_tree(pid):
+    import psutil
     main = psutil.Process(pid)
     main.suspend()
     for child in main.children(recursive=True):
         child.suspend()
 
 def resume_tree(pid):
+    import psutil
     main = psutil.Process(pid)
     main.resume()
     for child in main.children(recursive=True):
