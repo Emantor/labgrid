@@ -101,7 +101,7 @@ class Config:
             path = str(self.data['tools'][tool])
             return self.resolve_path(path)
         except KeyError:
-            return None
+            return tool
 
     def get_image_path(self, kind):
         """Retrieve an entry from the images subkey

@@ -24,7 +24,7 @@ class MXSUSBDriver(Driver, BootstrapProtocol):
         super().__attrs_post_init__()
         # FIXME make sure we always have an environment or config
         if self.target.env:
-            self.tool = self.target.env.config.get_tool('mxs-usb-loader') or 'mxs-usb-loader'
+            self.tool = self.target.env.config.get_tool('mxs-usb-loader')
         else:
             self.tool = 'mxs-usb-loader'
 
@@ -60,7 +60,7 @@ class IMXUSBDriver(Driver, BootstrapProtocol):
         super().__attrs_post_init__()
         # FIXME make sure we always have an environment or config
         if self.target.env:
-            self.tool = self.target.env.config.get_tool('imx-usb-loader') or 'imx-usb-loader'
+            self.tool = self.target.env.config.get_tool('imx-usb-loader')
         else:
             self.tool = 'imx-usb-loader'
 
@@ -98,7 +98,7 @@ class RKUSBDriver(Driver, BootstrapProtocol):
         super().__attrs_post_init__()
         # FIXME make sure we always have an environment or config
         if self.target.env:
-            self.tool = self.target.env.config.get_tool('rk-usb-loader') or 'rk-usb-loader'
+            self.tool = self.target.env.config.get_tool('rk-usb-loader')
         else:
             self.tool = 'rk-usb-loader'
 
@@ -160,7 +160,7 @@ class UUUDriver(Driver, BootstrapProtocol):
         super().__attrs_post_init__()
         # FIXME make sure we always have an environment or config
         if self.target.env:
-            self.tool = self.target.env.config.get_tool('uuu-loader') or 'uuu-loader'
+            self.tool = self.target.env.config.get_tool('uuu-loader')
         else:
             self.tool = 'uuu-loader'
 
@@ -202,7 +202,7 @@ class BDIMXUSBDriver(Driver, BootstrapProtocol):
         super().__attrs_post_init__()
         # FIXME make sure we always have an environment or config
         if self.target.env:
-            self.tool = self.target.env.config.get_tool('imx_usb') or 'imx_usb'
+            self.tool = self.target.env.config.get_tool('imx_usb')
         else:
             self.tool = 'imx_usb'
 

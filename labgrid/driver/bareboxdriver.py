@@ -31,7 +31,7 @@ class BareboxDriver(CommandMixin, Driver, CommandProtocol, LinuxBootProtocol):
         login_timeout (int): optional, timeout for access to the shell
     """
     bindings = {"console": ConsoleProtocol, }
-    prompt = attr.ib(default="", validator=attr.validators.instance_of(str))
+    prompt = attr.ib(kw_only=True, validator=attr.validators.instance_of(str))
     autoboot = attr.ib(default="stop autoboot", validator=attr.validators.instance_of(str))
     interrupt = attr.ib(default="\n", validator=attr.validators.instance_of(str))
     bootstring = attr.ib(default=r"Linux version \d", validator=attr.validators.instance_of(str))
