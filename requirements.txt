@@ -1,4 +1,4 @@
-attrs==20.2.0
+attrs==21.4.0
 jinja2==2.11.3
 packaging==20.4
 pexpect==4.8.0
