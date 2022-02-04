@@ -3,7 +3,7 @@ jinja2==2.11.3
 packaging==20.4
 pexpect==4.8.0
 https://github.com/labgrid-project/pyserial/archive/v3.4.0.1.zip#egg=pyserial
-pytest==6.1.2
+pytest==7.0.0
 pyudev==0.22.0
 requests==2.24.0
 xmodem==0.4.5
