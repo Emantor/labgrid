@@ -3203,6 +3203,60 @@ to achieve the same effect:
        match:
          '@ID_PATH': pci-0000:05:00.0-usb-3-1.4
 
+The exporter also supports jinja2 templating, which makes it easy to support
+configurations where any supported device can be plugged into a USB hub and
+subsequently shows up in the remote infrastructure as a remote resource.
+Here is an example which enables ``USBSerial``, ``AndroidFastboot``,
+``IMXUSBLoader``, ``USBSDMuxDevice`` and ``USBPowerPort`` for a 7 port USB hub
+which is made up of two individual 4-port hubs:
+
+.. code-block:: yaml
+
+    {% for idx, sysfs, power_index in [
+            ('1', 'pci-0000:00:14.0-usb-0:3.1', '1'),
+            ('2', 'pci-0000:00:14.0-usb-0:3.2', '2'),
+            ('3', 'pci-0000:00:14.0-usb-0:3.3', '3'),
+            ('4', 'pci-0000:00:14.0-usb-0:3.4.1', '1'),
+            ('5', 'pci-0000:00:14.0-usb-0:3.4.2', '2'),
+            ('6', 'pci-0000:00:14.0-usb-0:3.4.3', '3'),
+            ('7', 'pci-0000:00:14.0-usb-0:3.4.4', '4')] %}
+
+    {% for if in [ '1.0', '1.1', '1.2', '1.3'] %}
+    examplegroup-7hub-p{{idx}}-{{if}}:
+      location: "7 Port Hub auf dem Schreibtisch"
+      USBSerialPort:
+        match:
+          '@ID_PATH': '{{sysfs}}:{{if}}'
+    {% endfor %}
+
+    dollysisters-dlink-7-p{{idx}}:
+      location: "7 Port Hub auf dem Schreibtisch"
+      IMXUSBLoader:
+        match:
+            'ID_PATH': '{{sysfs}}{{if}}'
+      AndroidFastboot:
+        match:
+            'ID_PATH': '{{sysfs}}{{if}}'
+      USBSDMuxDevice:
+        match:
+            '@ID_PATH': '{{sysfs}}{{if}}'
+      USBPowerPort:
+        match:
+      {% if idx|int < 4 %}
+          'ID_PATH': 'pci-0000:00:14.0-usb-0:3:1.0'
+      {% else %}
+          'ID_PATH': 'pci-0000:00:14.0-usb-0:3.4:1.0'
+      {% endif %}
+        index: {{power_index}}
+    {% endfor %}
+
+Note that this example also supports multiple USB serial ports exposed over the
+same USB device as separate interfaces using the second ``fox``-loop.
+
+.. note::
+   Labgrid also supports ``#`` as an escape character for the template commands,
+   which means that ``##`` needs to be used for comments.
+
 Templating
 ~~~~~~~~~~
 To reduce the amount of repeated declarations when many similar resources
