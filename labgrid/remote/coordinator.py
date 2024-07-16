@@ -393,7 +393,7 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
                         logging.debug("Received startup from %s with %s", name, version)
                     elif kind == "resource":
                         logging.debug("Received resource from %s with %s", name, in_msg.resource)
-                        action, resource = session.set_resource(
+                        action, _ = session.set_resource(
                             in_msg.resource.path.group_name, in_msg.resource.path.resource_name, in_msg.resource
                         )
                         if action is Action.ADD:
