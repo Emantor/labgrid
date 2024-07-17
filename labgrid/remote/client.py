@@ -1438,7 +1438,7 @@ class ClientSession:
             try:
                 k, v = pair.split("=")
             except ValueError:
-                raise UserError(f"'{pair}' is not a vaild filter (must contain a '=')")
+                raise UserError(f"'{pair}' is not a valid filter (must contain a '=')")
             if not TAG_KEY.match(k):
                 raise UserError(f"Key '{k}' in filter '{pair}' is invalid")
             if not TAG_KEY.match(v):

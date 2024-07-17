@@ -890,7 +890,7 @@ class Exporter:
                         in_message.response.success = success
                         if reason:
                             in_message.response.reason = reason
-                        logging.debug("queing %s", in_message)
+                        logging.debug("queuing %s", in_message)
                         self.out_queue.put_nowait(in_message)
                         logging.debug("queued %s", in_message)
                 else:
