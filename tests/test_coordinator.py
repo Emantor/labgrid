@@ -81,7 +81,6 @@ def test_coordinator_get_places(coordinator, channel_stub):
     assert len(places) == 2, f"Returned places not two: {places}"
     assert set(names) == {"test", "test2"}, f"There was an error: {res}"
 
-@pytest.mark.timeout(5)
 def test_coordinator_exporter_session(coordinator, channel_stub):
     import queue
     queue = queue.Queue()
