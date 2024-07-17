@@ -900,10 +900,11 @@ class Exporter:
             if e.code() == grpc.StatusCode.UNAVAILABLE:
                 if got_message:
                     logging.error("coordinator became unavailable: %s", e.details())
-                    global reexec
-                    reexec = True
                 else:
                     logging.error("coordinator is unavailable: %s", e.details())
+
+                global reexec
+                reexec = True
             else:
                 logging.exception("unexpected grpc error in coordinator message pump task")
         except Exception:
