@@ -830,7 +830,15 @@ class Exporter:
                 await self.add_resource(group_name, resource_name, cls, params)
 
             # flush queued message
-            await self.out_queue.join()
+            while not self.pump_task.done():
+                try:
+                    await asyncio.wait_for(self.out_queue.join(), timeout=1)
+                    break
+                except asyncio.TimeoutError:
+                    if self.pump_task.done():
+                        await self.pump_task
+                        logging.debug("pump task exited, shutting down exporter")
+                        return
 
         logging.info("creating poll task")
         self.poll_task = self.loop.create_task(self.poll())
