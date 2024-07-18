@@ -145,13 +145,13 @@ class ClientSession:
         event = self.sync_events[identifier] = asyncio.Event()
         msg = labgrid_coordinator_pb2.ClientInMessage()
         msg.sync.id = identifier
-        logging.info("sending sync %s", identifier)
+        logging.debug("sending sync %s", identifier)
         self.out_queue.put_nowait(msg)
         await event.wait()
         if self.stopping.is_set():
-            logging.info("sync %s failed", identifier)
+            logging.debug("sync %s failed", identifier)
         else:
-            logging.info("received sync %s", identifier)
+            logging.debug("received sync %s", identifier)
         return not self.stopping.is_set()
 
     def cancel_pending_syncs(self):
