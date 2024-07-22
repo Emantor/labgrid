@@ -26,9 +26,6 @@ from pprint import pformat
 import attr
 import grpc
 
-import labgrid.remote.generated.labgrid_coordinator_pb2_grpc as labgrid_coordinator_pb2_grpc
-import labgrid.remote.generated.labgrid_coordinator_pb2 as labgrid_coordinator_pb2
-
 from .common import (
     ResourceEntry,
     ResourceMatch,
@@ -41,6 +38,7 @@ from .common import (
 )
 from .. import Environment, Target, target_factory
 from ..exceptions import NoDriverFoundError, NoResourceFoundError, InvalidConfigError
+from .generated import labgrid_coordinator_pb2, labgrid_coordinator_pb2_grpc
 from ..resource.remote import RemotePlaceManager, RemotePlace
 from ..util import diff_dict, flat_dict, dump, atomic_replace, labgrid_version, Timeout
 from ..util.proxy import proxymanager
