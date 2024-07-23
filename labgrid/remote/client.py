@@ -503,7 +503,7 @@ class ClientSession:
         """Add a place to the coordinator"""
         name = self.args.place
         if not name:
-            raise UserError("missing place name. Set with -p <place> or via env var $PLACE")
+            raise UserError("missing place name. Set with -p <place> or via env var LG_PLACE")
 
         request = labgrid_coordinator_pb2.AddPlaceRequest(name=name)
         try:
