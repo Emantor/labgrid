@@ -552,7 +552,7 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
         rm = ResourceMatch(*pattern.split("/"), rename=rename)
         if rm in place.matches:
             await context.abort(
-                grpc.StatusCode.FAILED_PRECONDITION, f"Match {rm} already exists"
+                grpc.StatusCode.ALREADY_EXISTS, f"Match {rm} already exists"
             )
         place.matches.append(rm)
         place.touch()
