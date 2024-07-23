@@ -505,9 +505,9 @@ class ClientSession:
         if not name:
             raise UserError("missing place name. Set with -p <place> or via env var $PLACE")
 
-        place = labgrid_coordinator_pb2.AddPlaceRequest(name=name)
+        request = labgrid_coordinator_pb2.AddPlaceRequest(name=name)
         try:
-            await self.stub.AddPlace(place)
+            await self.stub.AddPlace(request)
             await self.sync_with_coordinator()
         except grpc.aio.AioRpcError as e:
             raise ServerError(e.details())
@@ -515,9 +515,9 @@ class ClientSession:
     async def del_place(self):
         """Delete a place from the coordinator"""
         name = self.args.place
-        place = labgrid_coordinator_pb2.DeletePlaceRequest(name=name)
+        request = labgrid_coordinator_pb2.DeletePlaceRequest(name=name)
         try:
-            await self.stub.DeletePlace(place)
+            await self.stub.DeletePlace(request)
             await self.sync_with_coordinator()
         except grpc.aio.AioRpcError as e:
             raise ServerError(e.details())
