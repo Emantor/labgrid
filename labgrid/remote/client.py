@@ -593,10 +593,10 @@ class ClientSession:
         for pattern in self.args.patterns:
             if not 2 <= pattern.count("/") <= 3:
                 raise UserError(
-                    f"invalid pattern format '{pattern}' (use 'exporter/group/cls/name')"  # FIXME: done in coordinator?
+                    f"invalid pattern format '{pattern}' (use 'exporter/group/cls/name')"
                 )
             if place.hasmatch(pattern.split("/")):
-                print(f"pattern '{pattern}' exists, skipping", file=sys.stderr)  # FIXME: done in coordinator?
+                print(f"pattern '{pattern}' exists, skipping", file=sys.stderr)
                 continue
 
             request = labgrid_coordinator_pb2.AddPlaceMatchRequest(placename=place.name, pattern=pattern)
@@ -615,14 +615,14 @@ class ClientSession:
         for pattern in self.args.patterns:
             if not 2 <= pattern.count("/") <= 3:
                 raise UserError(
-                    f"invalid pattern format '{pattern}' (use 'exporter/group/cls/name')"  # FIXME: done in coordinator?
+                    f"invalid pattern format '{pattern}' (use 'exporter/group/cls/name')"
                 )
             if not place.hasmatch(pattern.split("/")):
-                print(f"pattern '{pattern}' not found, skipping", file=sys.stderr)  # FIXME: done in coordinator?
+                print(f"pattern '{pattern}' not found, skipping", file=sys.stderr)
 
             request = labgrid_coordinator_pb2.DeletePlaceMatchRequest(
                 placename=place.name, pattern=pattern
-            )  # FIXME: rename?
+            )
 
             try:
                 await self.stub.DeletePlaceMatch(request)
@@ -642,13 +642,13 @@ class ClientSession:
         if not 2 <= pattern.count("/") <= 3:
             raise UserError(
                 f"invalid pattern format '{pattern}' (use 'exporter/group/cls/name')"
-            )  # FIXME: done in coordinator?
+            )
         if place.hasmatch(pattern.split("/")):
             raise UserError(f"pattern '{pattern}' exists")  # FIXME: done in coordinator?
         if "*" in pattern:
             raise UserError(
                 f"invalid pattern '{pattern}' ('*' not allowed for named matches)"
-            )  # FIXME: done in coordinator?
+            )
         if not name:
             raise UserError(f"invalid name '{name}'")  # FIXME: done in coordinator?
 
@@ -690,7 +690,7 @@ class ClientSession:
             await self.sync_with_coordinator()
             print(f"acquired place {place.name}")
         except grpc.aio.AioRpcError as e:
-            # check potential failure causes  # FIXME: done in coordinator?
+            # check potential failure causes
             for exporter, groups in sorted(self.resources.items()):
                 for group_name, group in sorted(groups.items()):
                     for resource_name, resource in sorted(group.items()):
@@ -720,7 +720,7 @@ class ClientSession:
             if not self.args.kick:
                 raise UserError(
                     f"place {place.name} is acquired by a different user ({place.acquired}), use --kick if you are sure"
-                )  # pylint: disable=line-too-long # FIXME: done in coordinator?
+                )  # pylint: disable=line-too-long
             print(f"warning: kicking user ({place.acquired})")
 
         request = labgrid_coordinator_pb2.ReleasePlaceRequest(placename=place.name)
