@@ -553,7 +553,7 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
         if rm in place.matches:
             await context.abort(
                 grpc.StatusCode.FAILED_PRECONDITION, f"Match {rm} already exists"
-            )  # FIXME: functional change, previously client skipped match while complaining
+            )
         place.matches.append(rm)
         place.touch()
         self._publish_place(place)
