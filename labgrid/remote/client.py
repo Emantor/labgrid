@@ -588,8 +588,6 @@ class ClientSession:
         """Add a match for a place, making fuzzy matching available to the
         client"""
         place = self.get_idle_place()
-        if place.acquired:
-            raise UserError(f"can not change acquired place {place.name}")  # FIXME: done in coordinator?
         for pattern in self.args.patterns:
             if not 2 <= pattern.count("/") <= 3:
                 raise UserError(
@@ -610,8 +608,6 @@ class ClientSession:
     async def del_match(self):
         """Delete a match for a place"""
         place = self.get_idle_place()
-        if place.acquired:
-            raise UserError(f"can not change acquired place {place.name}")  # FIXME: done in coordinator?
         for pattern in self.args.patterns:
             if not 2 <= pattern.count("/") <= 3:
                 raise UserError(
@@ -635,8 +631,6 @@ class ClientSession:
 
         Fuzzy matching is not allowed to avoid accidental names conflicts."""
         place = self.get_idle_place()
-        if place.acquired:
-            raise UserError(f"can not change acquired place {place.name}")  # FIXME: done in coordinator?
         pattern = self.args.pattern
         name = self.args.name
         if not 2 <= pattern.count("/") <= 3:
