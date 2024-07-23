@@ -514,8 +514,8 @@ class ClientSession:
 
     async def del_place(self):
         """Delete a place from the coordinator"""
-        name = self.args.place
-        request = labgrid_coordinator_pb2.DeletePlaceRequest(name=name)
+        place = self.get_idle_place()
+        request = labgrid_coordinator_pb2.DeletePlaceRequest(name=place.name)
         try:
             await self.stub.DeletePlace(request)
             await self.sync_with_coordinator()
@@ -670,11 +670,7 @@ class ClientSession:
 
     async def acquire(self):
         """Acquire a place, marking it unavailable for other clients"""
-        place = self.get_place()
-        if place.acquired:
-            raise UserError(
-                f"place {place.name} is already acquired by {place.acquired}"
-            )  # FIXME: done in coordinator?
+        place = self.get_idle_place()
 
         if not self.args.allow_unmatched:
             self.check_matches(place)
@@ -707,10 +703,8 @@ class ClientSession:
 
     async def release(self):
         """Release a previously acquired place"""
-        place = self.get_place()
+        place = self.get_acquired_place()
         user = self.getuser()
-        if not place.acquired:
-            raise UserError(f"place {place.name} is not acquired")  # FIXME: done in coordinator?
         _, user = place.acquired.split("/")
         if user != self.getuser():
             if not self.args.kick:
