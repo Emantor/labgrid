@@ -643,8 +643,6 @@ class ClientSession:
             raise UserError(
                 f"invalid pattern format '{pattern}' (use 'exporter/group/cls/name')"
             )
-        if place.hasmatch(pattern.split("/")):
-            raise UserError(f"pattern '{pattern}' exists")  # FIXME: done in coordinator?
         if "*" in pattern:
             raise UserError(
                 f"invalid pattern '{pattern}' ('*' not allowed for named matches)"
