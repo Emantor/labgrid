@@ -75,7 +75,7 @@ so you can restart the service without losing state.
 
 .. code-block:: bash
 
-   $ docker run -t -p 20408:20408 -v $HOME/crossbar:/opt/coordinator \
+   $ docker run -t -p 20408:20408 -v $HOME/coordinator:/opt/coordinator \
 	 docker.io/labgrid/coordinator
 
 
