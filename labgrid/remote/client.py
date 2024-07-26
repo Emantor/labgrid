@@ -697,7 +697,9 @@ class ClientSession:
 
     async def release(self):
         """Release a previously acquired place"""
-        place = self.get_acquired_place()
+        place = self.get_place()
+        if not place.acquired:
+            raise UserError(f"place {place.name} is not acquired")
         user = self.getuser()
         _, user = place.acquired.split("/")
         if user != self.getuser():
