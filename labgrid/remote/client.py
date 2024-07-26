@@ -721,7 +721,9 @@ class ClientSession:
 
     async def release_from(self):
         """Release a place, but only if acquired by a specific user"""
-        place = self.get_acquired_place()
+        place = self.get_place()
+        if not place.acquired:
+            raise UserError(f"place {place.name} is not acquired")
 
         request = labgrid_coordinator_pb2.ReleasePlaceRequest(placename=place.name, fromuser=self.args.acquired)
 
