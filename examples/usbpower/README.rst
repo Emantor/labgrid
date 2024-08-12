@@ -41,7 +41,7 @@ Software Setup
 --------------
 
 The following expects that labgrid is installed in the
-active virtualenv and crossbar is installed into a separate virtualenv.
+active virtualenv.
 The ``uhubctl`` and ``usbsdmux`` tools need to be installed on the system.
 
 Library Example
