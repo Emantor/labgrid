@@ -179,6 +179,21 @@ load a configuration file.
    On exit of your script/application, labgrid will call ``cleanup()`` on the
    targets using the python atexit module.
 
+Event-Loop
+~~~~~~~~~~
+
+Some functionality inside of labgrid requires the usage of asyncio. The
+labgrid.loop package has helper functions for event loop handling.
+The `ensure_event_loop()` function is used to ensure there is an available loop,
+so this can be used inside of custom drivers which require async function calls.
+Note that this loop is not necessarily running and your driver should ensure to
+run the loop for async functions and cleanup any leftover tasks after running
+the loop.
+
+In case you already have a running loop you can use `set_loop` to set your event
+loop for labgrid to use. Alternatively `start_session` with your loop internally
+will also ensure that labgrid uses your event loop.
+
 Targets
 ~~~~~~~
 
