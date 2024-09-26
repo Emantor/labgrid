@@ -2,6 +2,7 @@ import asyncio
 
 import pysnmp.hlapi.v3arch.asyncio as hlapi
 from ..driver.exception import ExecutionError
+from ..loop import ensure_event_loop
 
 
 class SimpleSNMP:
@@ -10,15 +11,7 @@ class SimpleSNMP:
         if port is None:
             port = 161
 
-        self.loop_created = False
-
-        try:
-            # if called from async code, try to get current's thread loop
-            self.loop = asyncio.get_running_loop()
-        except RuntimeError:
-            self.loop_created = True
-            # no previous, external or running loop found, create a new one
-            self.loop = asyncio.new_event_loop()
+        self.loop = ensure_event_loop()
 
         self.engine = hlapi.SnmpEngine()
         self.transport = self.loop.run_until_complete(hlapi.UdpTransportTarget.create((host, port)))
@@ -47,6 +40,3 @@ class SimpleSNMP:
 
     def cleanup(self):
         self.engine.closeDispatcher()
-        if self.loop_created:
-            self.loop.run_until_complete(self.loop.shutdown_asyncgens())
-            self.loop.close()
