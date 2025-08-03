@@ -7,6 +7,7 @@ from .. import Environment
 from ..consoleloggingreporter import ConsoleLoggingReporter
 from ..util.helper import processwrapper
 from ..logging import StepFormatter, StepLogger
+from ..exceptions import NoDriverFoundError
 
 LABGRID_ENV_KEY = pytest.StashKey[Environment]()
 
@@ -131,7 +132,7 @@ def pytest_collection_modifyitems(config, items):
                 )
             item.add_marker(skip)
 
-@pytest.hookimpl(wrapper=True)
+@pytest.hookimpl(tryfirst=True)
 def pytest_runtest_setup(item):
     """
     Skip test if one of the targets uses a strategy considered broken.
@@ -144,8 +145,9 @@ def pytest_runtest_setup(item):
         # skip test even if only one of the targets in the env has a broken strategy
         for target_name in env.config.get_targets():
             target = env.get_target(target_name)
-            strategy = target.get_driver("Strategy")
+            try:
+                strategy = target.get_driver("Strategy")
+            except NoDriverFoundError:
+                return
             if strategy and strategy.broken:
                 pytest.skip(f"{strategy.__class__.__name__} is in broken state")
-
-    yield
