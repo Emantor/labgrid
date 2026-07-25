@@ -301,13 +301,11 @@ class Target:
         assert isinstance(resource, Resource)
         assert not resource.bindings
         assert resource not in self.resources
-        assert resource.target is None
 
         # update state
         self.resources.append(resource)
         # update lookup table
         self._lookup_table[resource.__class__.__name__] = resource.__class__
-        resource.target = self
         resource.state = BindingState.bound
 
     def bind_driver(self, client):
@@ -324,7 +322,6 @@ class Target:
         # consistency check
         assert isinstance(client, Driver)
         assert client not in self.drivers
-        assert client.target is None
 
         mapping = self._binding_map
         self._binding_map = {}
@@ -416,7 +413,6 @@ class Target:
             if abc.ABC in c.mro():
                 self._lookup_table[c.__name__] = c
 
-        client.target = self
         for supplier in bound_suppliers:
             supplier.clients.add(client)
             client.suppliers.add(supplier)

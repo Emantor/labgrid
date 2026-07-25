@@ -47,12 +47,8 @@ class BindingMixin:
     def __attrs_post_init__(self):
         self.suppliers = set()
         self.clients = set()
-        target = self.target
-        if target is not None:
-            # bind will set it again if successful
-            self.target = None
-            target.bind(self)
-            assert self.target is not None
+        if self.target is not None:
+            self.target.bind(self)
 
     @property
     def display_name(self):
