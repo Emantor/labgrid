@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import contextvars
 import logging
 import asyncio
 import traceback
@@ -18,7 +17,6 @@ import attr
 import grpc
 from grpc_reflection.v1alpha import reflection
 
-from labgrid.remote.grpc.interceptor.server import IdentityServerInterceptor
 from labgrid.remote.identity import ClientIdentity, infer_peer_identity
 
 from .common import (
@@ -35,10 +33,6 @@ from .scheduler import TagSet, schedule
 from .generated import labgrid_coordinator_pb2
 from .generated import labgrid_coordinator_pb2_grpc
 from ..util import atomic_replace, labgrid_version, yaml, Timeout
-
-client_identity_context: contextvars.ContextVar[Optional[ClientIdentity]] = contextvars.ContextVar(
-    "client_identity", default=None
-)
 
 
 @contextmanager
@@ -192,6 +186,15 @@ def locked(func):
     return wrapper
 
 
+def add_identity(func):
+    @wraps(func)
+    async def wrapper(self, request, context):
+        identity = ClientIdentity.from_metadata(context.invocation_metadata())
+        return await func(self, request, context, identity=identity)
+
+    return wrapper
+
+
 class ExporterCommand:
     def __init__(self, request) -> None:
         self.request = request
@@ -327,7 +330,7 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
         assert peer not in self.clients
         out_msg_queue = asyncio.Queue()
 
-        identity = client_identity_context.get()
+        identity = ClientIdentity.from_metadata(context.invocation_metadata())
         if identity:
             logging.debug("client identity provided in gRPC metadata: %s", identity)
             self.clients[peer] = ClientSession(self, peer, identity.id, out_msg_queue, identity.user_agent)
@@ -432,7 +435,7 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
         out_msg.hello.version = labgrid_version()
         yield out_msg
 
-        identity = client_identity_context.get()
+        identity = ClientIdentity.from_metadata(context.invocation_metadata())
         if identity:
             logging.debug("exporter identity provided in gRPC metadata: %s", identity)
             if existing := self.get_exporter_by_name(identity.id):
@@ -889,12 +892,13 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
             idx = place.acquired_resources.index(oldresource)
             place.acquired_resources[idx] = newresource
 
+    @add_identity
     @locked
-    async def AcquirePlace(self, request, context):
+    async def AcquirePlace(self, request, context, *, identity):
         peer = context.peer()
         name = request.placename
         try:
-            username = infer_peer_identity(self.clients, context, client_identity_context)
+            username = infer_peer_identity(self.clients, context, identity)
         except KeyError:
             await context.abort(grpc.StatusCode.FAILED_PRECONDITION, f"Peer {peer} does not have a valid session")
         print(request)
@@ -958,13 +962,14 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
         print(f"{place.name}: place released")
         return labgrid_coordinator_pb2.ReleasePlaceResponse()
 
+    @add_identity
     @locked
-    async def AllowPlace(self, request, context):
+    async def AllowPlace(self, request, context, identity):
         placename = request.placename
         user = request.user
         peer = context.peer()
         try:
-            username = infer_peer_identity(self.clients, context, client_identity_context)
+            username = infer_peer_identity(self.clients, context, identity)
         except KeyError:
             await context.abort(grpc.StatusCode.FAILED_PRECONDITION, f"Peer {peer} does not have a valid session")
         try:
@@ -1101,8 +1106,9 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
             if old_map.get(name) != new_map.get(name):
                 self._publish_place(self.places[name])
 
+    @add_identity
     @locked
-    async def CreateReservation(self, request: labgrid_coordinator_pb2.CreateReservationRequest, context):
+    async def CreateReservation(self, request: labgrid_coordinator_pb2.CreateReservationRequest, context, *, identity):
         peer = context.peer()
 
         fltrs = {}
@@ -1120,7 +1126,7 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
                 fltr[k] = v
 
         try:
-            owner = infer_peer_identity(self.clients, context, client_identity_context)
+            owner = infer_peer_identity(self.clients, context, identity)
         except KeyError:
             await context.abort(grpc.StatusCode.FAILED_PRECONDITION, f"Peer {peer} does not have a valid session")
         res = Reservation(owner=owner, prio=request.prio, filters=fltrs)
@@ -1172,7 +1178,6 @@ async def serve(listen, cleanup, server_credentials=None) -> None:
     ]
     server = grpc.aio.server(
         options=channel_options,
-        interceptors=[IdentityServerInterceptor(client_identity_context)],
     )
     coordinator = Coordinator()
     labgrid_coordinator_pb2_grpc.add_CoordinatorServicer_to_server(coordinator, server)
