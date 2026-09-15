@@ -1290,7 +1290,8 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
 
         return labgrid_coordinator_pb2.ListPlacesResponse(places=places)
 
-    async def ListResources(self, request, context):
+    @require_capability(Capability.list_resources)
+    async def ListResources(self, request, context, *, identity):
         logging.debug("ListResources")
 
         resources = []
