@@ -1288,7 +1288,8 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
         except Exception:
             logging.exception("error during get places")
 
-    async def ListPlaces(self, request, context):
+    @require_capability(Capability.list_places)
+    async def ListPlaces(self, request, context, *, identity):
         logging.debug("ListPlaces")
         # Successful list reads do not yield while copying the current state.
         # They need not wait for mutations which are awaiting exporter replies.
