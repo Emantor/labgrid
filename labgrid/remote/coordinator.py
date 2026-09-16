@@ -1155,7 +1155,7 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
         print(f"{place.name}: place released")
         return labgrid_coordinator_pb2.ReleasePlaceResponse()
 
-    async def share_place(self, placename, user, context, *, identity):
+    async def share_place(self, placename, user, context, identity, capability_owned, capability_any):
         peer = context.peer()
 
         try:
@@ -1179,18 +1179,15 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
                 await context.abort(
                     grpc.StatusCode.UNAUTHENTICATED, "Client identity is required when using capabilities"
                 )
-            if owned and not (
-                Capability.allow_place_owned in identity.capabilities
-                or Capability.allow_place_any in identity.capabilities
-            ):
+            if owned and not (capability_owned in identity.capabilities or capability_any in identity.capabilities):
                 await context.abort(
                     grpc.StatusCode.PERMISSION_DENIED,
-                    f"Capability {Capability.allow_place_owned} not in client capabilities {identity.capabilities}",
+                    f"Capability {capability_owned} not in client capabilities {identity.capabilities}",
                 )
-            elif not owned and not Capability.allow_place_any in identity.capabilities:
+            elif not owned and not capability_any in identity.capabilities:
                 await context.abort(
                     grpc.StatusCode.PERMISSION_DENIED,
-                    f"Capability {Capability.allow_place_any} not in client capabilities {identity.capabilities}",
+                    f"Capability {capability_any} not in client capabilities {identity.capabilities}",
                 )
 
         place.allowed.add(user)
@@ -1202,7 +1199,14 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
     @locked
     async def AllowPlace(self, request, context, *, identity):
         logging.warning("AllowPlace is deprecated; use SharePlace instead")
-        await self.share_place(request.placename, request.user, context, identity=identity)
+        await self.share_place(
+            request.placename,
+            request.user,
+            context,
+            identity,
+            Capability.allow_place_owned,
+            Capability.allow_place_any,
+        )
         return labgrid_coordinator_pb2.AllowPlaceResponse()
 
     @add_identity
@@ -1213,7 +1217,9 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
         if not name or not isinstance(name, str):
             await context.abort(grpc.StatusCode.INVALID_ARGUMENT, "name was not a string")
 
-        await self.share_place(name, request.user, context, identity=identity)
+        await self.share_place(
+            name, request.user, context, identity, Capability.share_place_owned, Capability.share_place_any
+        )
         return labgrid_coordinator_pb2.SharePlaceResponse()
 
     @add_identity
