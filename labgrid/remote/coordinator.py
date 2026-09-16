@@ -1574,7 +1574,8 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
         reservations = [x.as_pb2() for x in self.reservations.values()]
         return labgrid_coordinator_pb2.GetReservationsResponse(reservations=reservations)
 
-    async def ListReservations(self, request, context):
+    @require_capability(Capability.list_reservations)
+    async def ListReservations(self, request, context, *, identity):
         # Copy the current state without yielding or waiting for the mutation lock.
         reservations = []
         for reservation in self.reservations.values():
