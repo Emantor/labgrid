@@ -40,6 +40,15 @@ class ProcessWrapper:
     callbacks = attr.ib(default=attr.Factory(list))
     loglevel = logging.INFO
 
+    """
+
+    Args:
+        res (Resource): resource used for command wrapping
+        command (list): list of commands to run in the ProcessWrapper
+    """
+    def check_wrapped_output(self, res, command: list, **kwargs):
+        return self.check_output(res.wrap_command(command), **kwargs)
+
     @step(args=['command'], result=True, tag='process')
     def check_output(
         self, command, *, print_on_silent_log=False, input=None, stdin=None, stderr=subprocess.STDOUT, timeout=None
