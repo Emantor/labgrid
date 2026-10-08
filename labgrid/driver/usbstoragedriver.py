@@ -115,7 +115,7 @@ class USBStorageDriver(Driver):
 
                 args = ["cp", "-T", copied_sources[0], target_path]
 
-            processwrapper.check_output(self.storage.wrap_command(args))
+            processwrapper.check_wrapped_output(self.storage, args)
             self.proxy.unmount(self.devpath)
         except:
             # We are going to die with an exception anyway, so no point in waiting
