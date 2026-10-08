@@ -46,7 +46,7 @@ class AndroidFastbootDriver(Driver):
         else:
             option = f"{self.fastboot.protocol}:{self.fastboot.address}:{self.fastboot.port}"
 
-        prefix = self.fastboot.command_prefix + [ self.tool, "-s", option ]
+        prefix = self.fastboot.wrap_command([self.tool, "-s", option])
 
         if self.sparse_size is not None:
             prefix += ["-S", self.sparse_size]
