@@ -18,6 +18,7 @@ import os
 import attr
 import grpc
 from grpc_reflection.v1alpha import reflection
+from packaging.version import Version
 
 from labgrid.remote.identity import ClientIdentity, infer_peer_identity
 
@@ -789,6 +790,11 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
     async def _lease_resource(self, place, resource, duration):
         assert self.lock.locked()
 
+        exporter = self.get_exporter_by_name(resource.path[0])
+        print(f"lease version: {Version(exporter.version)}")
+        if Version("26.1") > Version(exporter.version):
+            raise CoordinatorError(f"Exporter {exporter.name} does not support leasing, requires upgrade")
+
         # this triggers an update from the exporter which is published
         # to the clients
         request = labgrid_coordinator_pb2.ExporterLeaseStartedRequest()
@@ -797,7 +803,7 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
         request.place_name = place.name
         request.duration = duration
         cmd = ExporterCommand("lease_started_request", request)
-        self.get_exporter_by_name(resource.path[0]).queue.put_nowait(cmd)
+        exporter.queue.put_nowait(cmd)
         try:
             await cmd.wait()
         except asyncio.TimeoutError as e:
@@ -882,6 +888,11 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
     async def _notify_lease_extended_resource(self, place, resource, duration):
         assert self.lock.locked()
 
+        exporter = self.get_exporter_by_name(resource.path[0])
+        print(f"lease version: {Version(exporter.version)}")
+        if Version("26.1") > Version(exporter.version):
+            raise CoordinatorError(f"Exporter {exporter.name} does not support leasing, requires upgrade")
+
         request = labgrid_coordinator_pb2.ExporterLeaseExtendedRequest()
         request.group_name = resource.path[1]
         request.resource_name = resource.path[3]
@@ -890,7 +901,7 @@ class Coordinator(labgrid_coordinator_pb2_grpc.CoordinatorServicer):
         request.duration = duration
 
         cmd = ExporterCommand("lease_extended_request", request)
-        self.get_exporter_by_name(resource.path[0]).queue.put_nowait(cmd)
+        exporter.queue.put_nowait(cmd)
         try:
             await cmd.wait()
         except asyncio.TimeoutError as e:
